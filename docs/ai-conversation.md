@@ -21,8 +21,8 @@ The conversation was manually copied and structured into Markdown for readabilit
 
 Erledigt:
 
-- [Konzept](./konzept.md)
-- [JavaScript für die Browser-Konsole](./stayai-de.js)
+- [Konzept](../konzept.md)
+- [JavaScript für die Browser-Konsole](../stayai-de.js)
 
 Das Skript übersetzt statische und dynamische React-Inhalte, Dialoge und Attribute. Außerdem formatiert es Datum, Uhrzeit und Euro-Beträge nach `de-DE`.
 
@@ -36,24 +36,26 @@ Geprüft wurden alle Hauptseiten sowie Pause-, Storno-, Adress- und Geschmacksdi
 
 Erstellt und überarbeitet:
 
-- [agent.md](./agent.md)
-- [README.md](./README.md)
-- [tasks.md](./tasks.md)
-- [konzept.md](./konzept.md)
-- [aufgabe.md](./aufgabe.md)
-- [Tests](./stayai-de.test.js)
+- [agent.md](../agent.md)
+- [README.md](../README.md)
+- [tasks.md](../tasks.md)
+- [konzept.md](../konzept.md)
+- [aufgabe.md](../aufgabe.md)
+- [Tests](../stayai-de.test.js)
 
 **JavaScript-Aufbau**
-- Die IIFE kapselt das Skript und beendet vor einer erneuten Ausführung die alte Instanz ([stayai-de.js](./stayai-de.js:1)).
-- `exactTranslations` enthält feste Übersetzungen ([Zeile 9](./stayai-de.js:9)).
-- `replacements` übersetzt variable Texte wie Abonnementnummern, Mengen und Laufzeiten ([Zeile 112](./stayai-de.js:112)).
-- `formatEnglishDates()` konvertiert englische Datumsangaben ([Zeile 86](./stayai-de.js:86)).
-- `formatTimes()` wandelt AM/PM-Zeiten ins 24-Stunden-Format um ([Zeile 135](./stayai-de.js:135)).
-- `parseLocalizedNumber()` und `formatEuroAmounts()` unterstützen deutsche und englische Zahlenformate ([Zeile 150](./stayai-de.js:150)).
-- `translateText()` führt alle Übersetzungs- und Formatierungsschritte zusammen ([Zeile 190](./stayai-de.js:190)).
-- `processNode()` bearbeitet DOM-Texte und relevante Accessibility-Attribute, überspringt aber technische Inhalte ([Zeile 227](./stayai-de.js:227)).
-- Der `MutationObserver` erkennt neue React-Inhalte und bündelt Änderungen performant ([Zeile 269](./stayai-de.js:269)).
-- `window.StayAIDe` stellt `refresh()`, `translateText()` und `stop()` bereit ([Zeile 289](./stayai-de.js:289)).
+- Die IIFE kapselt das Skript und beendet vor einer erneuten Ausführung die alte Instanz.
+- `exactTranslations` enthält feste Übersetzungen.
+- `replacements` übersetzt variable Texte wie Abonnementnummern, Mengen und Laufzeiten.
+- `formatEnglishDates()` konvertiert englische Datumsangaben.
+- `formatTimes()` wandelt AM/PM-Zeiten ins 24-Stunden-Format um.
+- `parseLocalizedNumber()` und `formatEuroAmounts()` unterstützen deutsche und englische Zahlenformate.
+- `translateText()` führt alle Übersetzungs- und Formatierungsschritte zusammen.
+- `processNode()` bearbeitet DOM-Texte und relevante Accessibility-Attribute, überspringt aber technische Inhalte.
+- Der `MutationObserver` erkennt neue React-Inhalte und bündelt Änderungen performant.
+- `window.StayAIDe` stellt `refresh()`, `translateText()` und `stop()` bereit.
+
+Der vollständige Aufbau ist in [`stayai-de.js`](../stayai-de.js) dokumentiert.
 
 Verbessert wurden Idempotenz, Währungsparser, Zeitvalidierung, Performance und der Schutz von Script-, Style-, Template- und Formulardaten. Syntaxprüfung und alle sechs automatisierten Tests sind erfolgreich. Die manuelle Browser-Abschlussprüfung ist in `tasks.md` bewusst noch offen.
 
@@ -74,7 +76,7 @@ MutationObserver
 
 `parseLocalizedNumber()` ist eine Hilfsfunktion für die Währungsformatierung. `processNode()` und `schedule()` sind für dynamische React-Inhalte und Performance zuständig.
 
-Ich habe alle Funktionen in [stayai-de.js](./stayai-de.js:86) mit kurzen englischen Kommentaren versehen. Syntaxprüfung und alle sechs Tests laufen weiterhin erfolgreich.
+Ich habe alle Funktionen in [stayai-de.js](../stayai-de.js) mit kurzen englischen Kommentaren versehen. Syntaxprüfung und alle sechs Tests laufen weiterhin erfolgreich.
 
 Die einzige grundsätzliche Einschränkung: Eine DOM-Übersetzung ist ein pragmatischer Fallback. Ein natives i18n-System wäre robuster, steht bei dieser Drittanbieter-App aber nicht zur Verfügung.
 
@@ -84,13 +86,13 @@ Die einzige grundsätzliche Einschränkung: Eine DOM-Übersetzung ist ein pragma
 
 Du hattest recht: React rendert `€` und `89.92` teilweise als zwei getrennte Textknoten innerhalb eines `span` oder `td`. Die bisherige Logik konnte sie deshalb nicht gemeinsam formatieren.
 
-[formatSplitEuroAmount()](./stayai-de.js:227) verbindet sie logisch und erzeugt:
+[formatSplitEuroAmount()](../stayai-de.js) verbindet sie logisch und erzeugt:
 
 ```text
 89,92 €
 ```
 
-Die React-Knotenstruktur bleibt dabei erhalten. Ein entsprechender [Regressionstest](./stayai-de.test.js:64) wurde ergänzt. Alle sieben Tests sind erfolgreich.
+Die React-Knotenstruktur bleibt dabei erhalten. Ein entsprechender [Regressionstest](../stayai-de.test.js) wurde ergänzt. Alle sieben Tests sind erfolgreich.
 
 > ich find eimmer noch fehler in den texten mit den styling klassen text-sm text-muted-foreground. Es steht dort "started on" das ist falsch
 
@@ -98,7 +100,7 @@ Die React-Knotenstruktur bleibt dabei erhalten. Ein entsprechender [Regressionst
 
 Fehler gefunden und behoben: React trennt `"Started on "` und das Datum in zwei Textknoten. Durch das vorherige `trim()` konnte die alte Regex nicht greifen.
 
-Die Regel in [stayai-de.js](./stayai-de.js:115) funktioniert jetzt für beide DOM-Varianten:
+Die Regel in [stayai-de.js](../stayai-de.js) funktioniert jetzt für beide DOM-Varianten:
 
 ```text
 Started on Jun 22, 2026
@@ -140,7 +142,7 @@ Ergänzt wurden:
 - `Go to previous/next month` → deutsche Navigationsbeschriftungen
 - Dynamische Aktualisierung beim Monatswechsel
 
-Die Übersetzungen sind bewusst auf `.rdp` begrenzt ([stayai-de.js](./stayai-de.js:238)). Alle neun Tests bestehen.
+Die Übersetzungen sind bewusst auf `.rdp` begrenzt ([stayai-de.js](../stayai-de.js)). Alle neun Tests bestehen.
 
 Hinweis: Der Kalender beginnt weiterhin sonntags. Für einen echten Wochenbeginn am Montag müsste React Day Picker selbst mit deutscher Locale konfiguriert werden; ein nachträgliches Umsortieren des DOM wäre riskant. Den aktualisierten Code erneut vollständig in der Konsole ausführen.
 
@@ -179,7 +181,7 @@ Billed every 4 weeks
 → Abrechnung alle 4 Wochen
 ```
 
-Die neuen [Split-Text-Regeln](./stayai-de.js:159) erhalten alle React- und Zahlenknoten. Dashboard, Abonnements, neues/bearbeitetes Abonnement, Verlauf, Profil, Einstellungen, Dialoge, Kalender und Snackbar wurden geprüft.
+Die neuen [Split-Text-Regeln](../stayai-de.js) erhalten alle React- und Zahlenknoten. Dashboard, Abonnements, neues/bearbeitetes Abonnement, Verlauf, Profil, Einstellungen, Dialoge, Kalender und Snackbar wurden geprüft.
 
 Alle zehn Tests bestehen. Den aktualisierten Code bitte erneut vollständig in der Browser-Konsole ausführen.
 
@@ -189,11 +191,11 @@ Alle zehn Tests bestehen. Den aktualisierten Code bitte erneut vollständig in d
 
 Aktualisiert:
 
-- [stayai-de.js](./stayai-de.js:1) hat jetzt einen Code-Guide und sechs klar erkennbare Bereiche.
+- [stayai-de.js](../stayai-de.js) hat jetzt einen Code-Guide und sechs klar erkennbare Bereiche.
 - Alle Funktionen besitzen kurze englische Kommentare.
 - Datum, Uhrzeit und Währung enthalten konkrete Beispiele wie `€89.92 → 89,92 €`.
 - Lange Konfigurationen und reguläre Ausdrücke wurden besser umgebrochen.
-- [agent.md](./agent.md:16) enthält verbindliche Regeln für verständlichen, Meeting-tauglichen Code.
+- [agent.md](../agent.md) enthält verbindliche Regeln für verständlichen, Meeting-tauglichen Code.
 
 Alle zehn Tests laufen weiterhin erfolgreich.
 
@@ -213,7 +215,7 @@ Intensive Prüfung abgeschlossen:
 
 Performance: ca. `0,30 ms` pro Dashboard-Durchlauf und rund `650.000` Texttransformationen pro Sekunde im lokalen Referenzlauf.
 
-Aktualisiert wurden [stayai-de.js](./stayai-de.js), [Tests](./stayai-de.test.js), [Konzept](./konzept.md) und [agent.md](./agent.md).
+Aktualisiert wurden [stayai-de.js](../stayai-de.js), [Tests](../stayai-de.test.js), [Konzept](../konzept.md) und [agent.md](../agent.md).
 
 Eine direkte automatisierte Konsoleninjektion wurde vom Browser verhindert. Deshalb wurde das aktuelle Skript gegen frisch ausgelesene, strukturgetreue Website-DOMs ausgeführt. Für die finale Abgabe sollte es noch einmal manuell vollständig in die Konsole eingefügt werden.
 
@@ -283,7 +285,7 @@ Die Testausgabe ist dadurch im Meeting direkt erklärbar. Alle 13 Tests und beid
 
 > _[Shortened for readability: 14 previous messages omitted. Full raw Codex/tool output removed from this curated version.]_
 
-Die [Testdatei](./stayai-de.test.js) ist jetzt übersichtlich strukturiert:
+Die [Testdatei](../stayai-de.test.js) ist jetzt übersichtlich strukturiert:
 
 - Gemeinsame Browser- und DOM-Fixtures
 - Vier fachliche Test-Suites
@@ -323,7 +325,7 @@ Die Vorschläge waren überwiegend sinnvoll und wurden umgesetzt.
 - Fragmentanzahl-Mismatch abgesichert
 - Adresslabels werden explizit auf korrekte Übersetzung geprüft
 - Singularlogik auch für Geschmacksrichtungen und weitere Wochenangaben verbessert
-- Testanzahl in [README.md](./README.md) und [tasks.md](./tasks.md) aktualisiert
+- Testanzahl in [README.md](../README.md) und [tasks.md](../tasks.md) aktualisiert
 
 Beim Adresslabel war „unverändert“ nicht ganz richtig: `Street Address` soll zu `Straße und Hausnummer` werden. Der Test prüft nun genau diese erwartete Übersetzung.
 
@@ -385,11 +387,11 @@ Verifiziert: **16 Tests bestanden**, beide JavaScript-Dateien syntaktisch korrek
 
 Die Vorschläge sind umgesetzt. Die Testzahl blieb bei **16**, da die aktuelle Suite tatsächlich 16 Tests enthält.
 
-![Dashboard vorher](./assets/dashboard-before.png)
+![Dashboard vorher](../assets/dashboard-before.png)
 
-![Dashboard nachher](./assets/dashboard-after.png)
+![Dashboard nachher](../assets/dashboard-after.png)
 
-[README.md](./README.md) enthält jetzt:
+[README.md](../README.md) enthält jetzt:
 
 - drei statische Status-Badges
 - präzisierte Problemstellung
@@ -399,6 +401,35 @@ Die Vorschläge sind umgesetzt. Die Testzahl blieb bei **16**, da die aktuelle S
 
 Alle 16 Tests bestehen weiterhin.
 
+> er hat in der snackbar immer noch fehler wie: "Geschmacksrichtungen updated"
+
+Die Geschmacksupdate-Snackbar wurde vollständig lokalisiert:
+
+```text
+Flavors updated
+→ Geschmacksrichtungen aktualisiert
+```
+
+Ein Regressionstest deckt sowohl einen vollständigen Textknoten als auch die Aufteilung auf zwei React-Textknoten ab.
+
+> ist flavors updated nicht auch falsch? Flavors ist auch englisch
+
+Ja. Beide englischen Bestandteile werden gemeinsam übersetzt. Die Regel wurde anschließend auf die bekannte Snackbar begrenzt, damit andere Texte wie `Last updated` nicht nur teilweise übersetzt werden.
+
+> bitte prüfe noch einmal das Projekt nach best practices und human friendly readable, gibt es in den md Dateien noch Anpassungen?
+
+Der Review bestätigte den klaren, meetingtauglichen Aufbau von Skript und Tests. Gefunden wurden eine zu breite `updated`-Regel, veraltete Angaben mit 16 Tests, fehlerhafte relative Links in diesem Dokument und fehlende Dokumentation der neuen Snackbar.
+
+> bitte passe alle punkte an
+
+Alle Reviewpunkte wurden umgesetzt:
+
+- kontextbezogene Übersetzung von `Flavors updated` bei ein- und mehrknotigem Rendering
+- negativer Regressionstest für `Last updated`
+- README, Konzept und Aufgabenstatus auf 17 Tests und den neuen Snackbar-Fall aktualisiert
+- relative Repository-Links in diesem kuratierten Verlauf korrigiert
+- frühere Website-Prüfung zeitlich eingeordnet, ohne einen dauerhaft fehlerfreien Zustand zu behaupten
+
 ---
 
-*End of conversation log. Final state: 16 tests passing, zero dependencies, full German localization of the StayAI subscription dashboard.*
+*End of conversation log. Final state: 17 tests passing, zero dependencies, and regression coverage for all observed localization cases.*
