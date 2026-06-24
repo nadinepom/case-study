@@ -11,7 +11,6 @@ Dieses Repository enthält eine kleine, installationsfreie Lösung für die Stay
 - `stayai-de.test.js` sichert die reine Text- und Formatierungslogik ab.
 - `README.md` ist der Einstieg für Nutzung und Projektstruktur.
 - `konzept.md` dokumentiert Analyse, Architektur, Abwägungen und Präsentation.
-- `tasks.md` hält Erledigtes und offene Stakeholder-Fragen fest.
 
 ## Implementierungsregeln
 
@@ -23,7 +22,7 @@ Dieses Repository enthält eine kleine, installationsfreie Lösung für die Stay
 - Mehrfaches Ausführen muss sicher bleiben. Eine bestehende Instanz zuerst über `window.StayAIDe.stop()` beenden.
 - Übersetzungsregeln müssen idempotent sein: Bereits übersetzte Texte dürfen sich bei einem zweiten Lauf nicht verändern.
 - React-Navigation und dynamische Dialoge weiterhin über einen gebündelten `MutationObserver` unterstützen.
-- Keine Formularwerte, Kundendaten, Script-, Style-, Template- oder Textarea-Inhalte verändern.
+- Keine Formularwerte, editierbaren Inhalte, Kundendaten, Script-, Style-, Template- oder Textarea-Inhalte verändern.
 - Anzeigeformatierungen von Kundendaten eng über ihren sichtbaren Feldkontext begrenzen. Eingabewerte unverändert lassen.
 - Sichtbare Texte sowie `aria-label`, `alt`, `placeholder` und `title` berücksichtigen.
 - Für Eurobeträge `Intl.NumberFormat("de-DE", { currency: "EUR" })` verwenden.
@@ -40,6 +39,7 @@ Dieses Repository enthält eine kleine, installationsfreie Lösung für die Stay
 - Reine Zahlenknoten früh überspringen und überlappende Observer-Mutationen bündeln.
 - Performance-Änderungen mit einem reproduzierbaren Vergleich prüfen; keine Optimierung nur aufgrund eines Bauchgefühls einbauen.
 - Neue Snackbar-Sätze vollständig übersetzen; keine gemischten Ausgaben wie `Abonnement paused` akzeptieren.
+- Erkannte Mehrknotensätze bei unerwarteter Fragmentierung vollständig unverändert lassen, statt einzelne Fragmente zu übersetzen.
 
 ## Schnelle Orientierung im Meeting
 
@@ -73,6 +73,8 @@ Bei Änderungen an DOM-Verarbeitung oder Übersetzungen zusätzlich manuell auf 
 - Pause-, Überspringen- und Storno-Dialoge
 - Day Picker einschließlich sichtbarer und zugänglicher Beschriftungen
 - Sonner-Snackbars nach Pause, Resume und Skip
+- neu eingefügte Teilbäume, Attributmutationen und Stop-Verhalten des Observers
+- geschützte Namens-, E-Mail- und editierbare Inhalte
 - Profiladresskarte und unveränderte Werte im Bearbeitungsformular
 
 ## Sicherheits- und Scope-Regeln

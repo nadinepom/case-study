@@ -31,6 +31,7 @@ Die Verarbeitung folgt einer kleinen Pipeline:
 
 ```text
 DOM-Text oder Attribut
+  -> Schutzprüfung für editierbare Inhalte und Kundendaten
   -> exakte Übersetzung
   -> dynamische Übersetzungsregeln
   -> React-Mehrknotenregeln
@@ -43,7 +44,9 @@ DOM-Text oder Attribut
 
 ### Übersetzungen
 
-Ein `Map` enthält bekannte statische UI-Texte. Wiederverwendbare reguläre Ausdrücke behandeln variable Inhalte wie Abo-Nummern, Mengen und Laufzeiten. Ein kleiner Helfer wählt für Mengen die deutsche Singular- oder Pluralform. Strukturierte Regeln übersetzen Sätze, die React auf mehrere Textknoten verteilt, ohne Zahlenknoten zusammenzuführen. Dazu gehören auch Snackbars, deren deutsche Wortstellung von der englischen Vorlage abweicht. Die Begriffswahl ist aktuell auf `Abonnement` vereinheitlicht. Zukünftige Bestellungen erhalten den fachlich eindeutigen Status `Geplant` statt `Kommend`.
+Ein `Map` enthält bekannte statische UI-Texte. Wiederverwendbare reguläre Ausdrücke behandeln variable Inhalte wie Abo-Nummern, Mengen und Laufzeiten. Ein kleiner Helfer wählt für Mengen die deutsche Singular- oder Pluralform. Strukturierte Regeln übersetzen Sätze, die React auf mehrere Textknoten verteilt, ohne Zahlenknoten zusammenzuführen. Dazu gehören auch Snackbars, deren deutsche Wortstellung von der englischen Vorlage abweicht. Erkennt das Skript einen solchen Satz mit einer unerwarteten Fragmentanzahl, lässt es den vollständigen Satz unverändert, statt eine gemischtsprachige Teilausgabe zu erzeugen.
+
+Die Begriffswahl ist aktuell auf `Abonnement` vereinheitlicht. Zukünftige Bestellungen erhalten den fachlich eindeutigen Status `Geplant` statt `Kommend`.
 
 ### Lokalisierung
 
@@ -62,9 +65,9 @@ Ein lokaler Referenzlauf mit der ausgelesenen Dashboard-Struktur verarbeitet ein
 
 ### Schutz vor Nebenwirkungen
 
-Das Skript verändert nur Textknoten und übersetzungsrelevante Attribute. Formularwerte und technische Inhalte in `script`, `style`, `template`, `noscript` und `textarea` bleiben unverändert. Bereits deutsche Ausgaben werden bei einem zweiten Lauf nicht erneut verändert.
+Das Skript verändert nur Textknoten und übersetzungsrelevante Attribute. Formularwerte, `contenteditable`-Bereiche, Elemente mit `role="textbox"` und technische Inhalte in `script`, `style`, `template`, `noscript` und `textarea` bleiben unverändert. Bereits deutsche Ausgaben werden bei einem zweiten Lauf nicht erneut verändert.
 
-In der Profilanzeige wird eine vorangestellte Hausnummer in die deutsche Reihenfolge `Straßenname Hausnummer` gebracht und `Germany` als `Deutschland` angezeigt. Die Werte der Adress-Eingabefelder bleiben dabei unverändert.
+Die auf der Test-Webseite identifizierten Namens- und E-Mail-Anzeigen werden als Kundendaten geschützt. In der Profilanzeige wird nur die fachlich gewünschte Adressdarstellung angepasst: Eine vorangestellte Hausnummer wechselt in die deutsche Reihenfolge `Straßenname Hausnummer`, und `Germany` erscheint als `Deutschland`. Die Werte der Adress-Eingabefelder bleiben dabei unverändert.
 
 ## Qualitätsstrategie
 
@@ -83,6 +86,8 @@ Automatisierte Node-Tests prüfen:
 - React-stabile Preisupdates
 - Day-Picker-Texte und Accessibility-Attribute mit positivem und negativem Kontexttest
 - Anzeigeformatierung von Straße, Hausnummern wie `12a` und `12/1` sowie Land bei unveränderten Formularwerten
+- Schutz editierbarer Inhalte sowie bekannter Namens- und E-Mail-Anzeigen
+- neue Teilbäume, Attributmutationen und Abbruch ausstehender Aktualisierungen
 
 Die manuelle Testmatrix umfasst Dashboard, Abo-Tabs, neues Abo, Bestellverlauf, Profil sowie Pause-, Überspringen-, Storno- und Adressdialoge. Details zur Ausführung stehen in `README.md`.
 
@@ -94,6 +99,7 @@ Beim damaligen DOM-Abgleich wurden 685 echte Elemente aus sechs Hauptseiten und 
 - Ein natives i18n-System mit Translation Keys wäre langfristig robuster, kann ohne Kontrolle über die Drittanbieter-App aber nicht nachgerüstet werden.
 - Die fachliche Begriffswahl `Abonnement` versus `Abo` und das bevorzugte deutsche Datumsformat sollten vor dem Produktiveinsatz bestätigt werden.
 - Vor der produktiven Nutzung sind Tests mit echten Kundenzuständen sowie aktuellen Desktop- und Mobile-Browsern erforderlich.
+- Weitere Kundendatenbereiche einer produktiven Version müssen anhand ihrer DOM-Struktur als geschützt erfasst werden.
 - Der Day Picker bleibt ohne Zugriff auf seine React-Konfiguration sonntagsbasiert; die DOM-Schicht übersetzt nur Darstellung und Accessibility-Texte.
 
 ## Präsentationsablauf

@@ -38,7 +38,6 @@ Erstellt und überarbeitet:
 
 - [agent.md](../agent.md)
 - [README.md](../README.md)
-- [tasks.md](../tasks.md)
 - [konzept.md](../konzept.md)
 - [aufgabe.md](../aufgabe.md)
 - [Tests](../stayai-de.test.js)
@@ -325,7 +324,7 @@ Die Vorschläge waren überwiegend sinnvoll und wurden umgesetzt.
 - Fragmentanzahl-Mismatch abgesichert
 - Adresslabels werden explizit auf korrekte Übersetzung geprüft
 - Singularlogik auch für Geschmacksrichtungen und weitere Wochenangaben verbessert
-- Testanzahl in [README.md](../README.md) und [tasks.md](../tasks.md) aktualisiert
+- Testanzahl in [README.md](../README.md) und der damaligen Aufgabenliste aktualisiert
 
 Beim Adresslabel war „unverändert“ nicht ganz richtig: `Street Address` soll zu `Straße und Hausnummer` werden. Der Test prüft nun genau diese erwartete Übersetzung.
 
@@ -430,6 +429,26 @@ Alle Reviewpunkte wurden umgesetzt:
 - relative Repository-Links in diesem kuratierten Verlauf korrigiert
 - frühere Website-Prüfung zeitlich eingeordnet, ohne einen dauerhaft fehlerfreien Zustand zu behaupten
 
+> schaue dir das projekt noch einmal als senior software entwickler an und schaue wo man etwas verbessern kann.
+
+Der Senior-Review identifizierte vier für die Case Study relevante Verbesserungen: Schutz sichtbarer Kundendaten und editierbarer Inhalte, sichere Behandlung unbekannter React-Fragmentierungen, zusätzliche Observer-Tests und eine präzisere Beschreibung von `stop()`.
+
+> welche punkte würdest du jetzt für eine case study anpassen? Es soll gut und professionell aussehen.
+
+Für die Abgabe wurden bewusst nur diese fachlich relevanten Punkte priorisiert. Zusätzliche Bibliotheken, eine neue Architektur und eine künstliche Optimierung auf 100 Prozent Coverage wurden als unnötig bewertet.
+
+> bitte implementiere das und passe die md Dateien hinterher entsprechend an.
+
+Umgesetzt wurden:
+
+- Schutz der identifizierten Namens- und E-Mail-Anzeigen sowie von `contenteditable` und `role="textbox"`
+- vollständiges Blockieren bekannter Mehrknotensätze bei unerwarteter Fragmentanzahl
+- Observer-Tests für neue Teilbäume, Attributänderungen und ausstehende Updates bei `stop()`
+- Klarstellung, dass `stop()` zukünftige Aktualisierungen beendet, bestehende Übersetzungen aber im DOM belässt
+- Aktualisierung von README, Konzept, Aufgabenstatus und Agent-Regeln
+
+Die produktive Datei erreicht im lokalen Node-Lauf 98,01 Prozent Zeilen- und 83,24 Prozent Branch-Abdeckung.
+
 ---
 
-*End of conversation log. Final state: 17 tests passing, zero dependencies, and regression coverage for all observed localization cases.*
+*End of conversation log. Final state: 21 tests passing, zero dependencies, protected customer/editable content, and regression coverage for all observed localization cases.*

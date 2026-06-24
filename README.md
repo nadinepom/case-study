@@ -1,7 +1,7 @@
 # StayAI German Translation Layer
 
 ![Status: abgeschlossen](https://img.shields.io/badge/Status-abgeschlossen-2ea44f)
-![Tests: 17 bestanden](https://img.shields.io/badge/Tests-17%20bestanden-2ea44f)
+![Tests: 21 bestanden](https://img.shields.io/badge/Tests-21%20bestanden-2ea44f)
 ![Abhängigkeiten: keine](https://img.shields.io/badge/Abh%C3%A4ngigkeiten-keine-2563eb)
 
 Dieses Projekt löst die Übersetzungs- und Formatierungsaufgabe aus der StayAI Case Study. Das Skript ergänzt eine fremde React-Anwendung um deutsche UI-Texte sowie deutsche Datums-, Zeit- und Währungsformate, ohne den Quellcode der Anwendung zu verändern.
@@ -34,6 +34,8 @@ Die Übersetzung bleibt bei React-Seitenwechseln und dynamisch geladenen Dialoge
 - Sonner-Snackbars für Pausieren, Fortsetzen, Überspringen und Geschmacksupdates
 - Snackbars, deren dynamischer Satz auf mehrere React-Textknoten verteilt ist
 - deutsche Anzeige von Lieferadresse und Land im Profil
+- Schutz editierbarer Inhalte sowie bekannter Namens- und E-Mail-Anzeigen
+- vollständige oder bewusst unveränderte React-Sätze statt gemischter Teilübersetzungen
 - `aria-label`, `alt`, `placeholder` und `title`
 
 ## Konsolen-API
@@ -48,6 +50,8 @@ StayAIDe.stop();
 
 Die Beispielübersetzung ergibt `6. Juli 2026 um 15:30 Uhr - 89,92 €`.
 
+`stop()` beendet den `MutationObserver` und ausstehende Aktualisierungen. Bereits übersetzte Inhalte bleiben im DOM erhalten.
+
 ## Projektstruktur
 
 | Datei | Zweck |
@@ -57,7 +61,7 @@ Die Beispielübersetzung ergibt `6. Juli 2026 um 15:30 Uhr - 89,92 €`.
 | `assets/` | Vorher-/Nachher-Screenshots der Test-Webseite |
 | `aufgabe.md` | Ursprüngliche Aufgabenstellung |
 | `konzept.md` | Analyse, Architektur, Entscheidungen und Präsentationsablauf |
-| `tasks.md` | Umsetzungsstand und offene fachliche Fragen |
+| `docs/ai-conversation.md` | Kuratierter Verlauf der KI-gestützten Entwicklung |
 | `agent.md` | Arbeitsregeln für Coding Agents in diesem Projekt |
 
 ## Lokale Prüfung
@@ -69,17 +73,20 @@ node --check stayai-de.js
 node --test stayai-de.test.js
 ```
 
-Aktuell decken 17 automatisierte Tests in vier fachlichen Test-Suites ab:
+Aktuell decken 21 automatisierte Tests in vier fachlichen Test-Suites ab:
 
 - Übersetzungen einschließlich Singular, Plural und leerer Eingaben
 - Datums-, Zeit- und Währungsformate einschließlich Idempotenz
 - bekannte und unerwartete React-Mehrknotenstrukturen
 - Day-Picker-Texte und Attribute innerhalb und außerhalb des Kalenders
 - Adressdarstellung mit Hausnummern wie `12a` und `12/1`
-- dynamische Mutationen und unveränderte Formularwerte
+- Kundendatenanzeigen, editierbare Inhalte und unveränderte Formularwerte
+- Text-, Teilbaum- und Attributmutationen sowie das Stoppen geplanter Updates
 
 ## Technische Grenzen
 
 Die Lösung arbeitet auf DOM-Ebene, weil keine Translation Keys oder Quellcodezugriffe für die Drittanbieter-App verfügbar sind. Neue oder geänderte StayAI-Texte können daher zusätzliche Übersetzungsregeln erfordern.
 
-Formularwerte werden absichtlich nicht übersetzt, um keine Kundendaten zu verändern. Die Profilanzeige lokalisiert lediglich die Darstellung (`123 Main Street` → `Main Street 123`, `Germany` → `Deutschland`). Der Day Picker bleibt technisch sonntagsbasiert; für einen Wochenbeginn am Montag müsste die Drittanbieter-Komponente selbst mit deutscher Locale konfiguriert werden.
+Formularwerte, editierbare Bereiche sowie die auf der Test-Webseite identifizierten Namens- und E-Mail-Anzeigen werden nicht übersetzt. Die Profilanzeige lokalisiert lediglich die fachlich vorgesehenen Adresswerte (`123 Main Street` → `Main Street 123`, `Germany` → `Deutschland`). Weitere Kundendatenbereiche einer produktiven StayAI-Version müssten anhand ihrer DOM-Struktur ergänzt werden.
+
+Der Day Picker bleibt technisch sonntagsbasiert; für einen Wochenbeginn am Montag müsste die Drittanbieter-Komponente selbst mit deutscher Locale konfiguriert werden.
