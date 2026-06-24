@@ -26,6 +26,9 @@
     ["Notifications (F8)", "Benachrichtigungen (F8)"],
     ["Notifications alt+T", "Benachrichtigungen Alt+T"],
     ["Name updated", "Name aktualisiert"],
+    ["Flavors updated", "Geschmacksrichtungen aktualisiert"],
+    // Handles text left partially translated by an earlier script version.
+    ["Geschmacksrichtungen updated", "Geschmacksrichtungen aktualisiert"],
     ["Dashboard", "Übersicht"],
     ["Subscriptions", "Abonnements"],
     ["New Subscription", "Neues Abonnement"],
@@ -276,6 +279,10 @@
 
   // Rules for sentences that React renders as several adjacent text nodes.
   const splitTextRules = [
+    {
+      pattern: /^(?:Flavors|Geschmacksrichtungen) updated$/i,
+      fragments: () => ["Geschmacksrichtungen ", "aktualisiert"],
+    },
     {
       pattern: /^Subscription skipped for (\d+) weeks?$/i,
       fragments: (match) => [

@@ -1,7 +1,7 @@
 # StayAI German Translation Layer
 
 ![Status: abgeschlossen](https://img.shields.io/badge/Status-abgeschlossen-2ea44f)
-![Tests: 16 bestanden](https://img.shields.io/badge/Tests-16%20bestanden-2ea44f)
+![Tests: 17 bestanden](https://img.shields.io/badge/Tests-17%20bestanden-2ea44f)
 ![Abhängigkeiten: keine](https://img.shields.io/badge/Abh%C3%A4ngigkeiten-keine-2563eb)
 
 Dieses Projekt löst die Übersetzungs- und Formatierungsaufgabe aus der StayAI Case Study. Das Skript ergänzt eine fremde React-Anwendung um deutsche UI-Texte sowie deutsche Datums-, Zeit- und Währungsformate, ohne den Quellcode der Anwendung zu verändern.
@@ -31,7 +31,7 @@ Die Übersetzung bleibt bei React-Seitenwechseln und dynamisch geladenen Dialoge
 - React Day Picker mit deutschen Monaten, Wochentagen und Navigationslabels
 - Eurobeträge in englischen und deutschen Ausgangsformaten
 - getrennte React-Knoten für Währungssymbol und Betrag
-- Sonner-Snackbars für Pausieren, Fortsetzen und Überspringen
+- Sonner-Snackbars für Pausieren, Fortsetzen, Überspringen und Geschmacksupdates
 - Snackbars, deren dynamischer Satz auf mehrere React-Textknoten verteilt ist
 - deutsche Anzeige von Lieferadresse und Land im Profil
 - `aria-label`, `alt`, `placeholder` und `title`
@@ -69,7 +69,7 @@ node --check stayai-de.js
 node --test stayai-de.test.js
 ```
 
-Aktuell decken 16 automatisierte Tests in vier fachlichen Test-Suites ab:
+Aktuell decken 17 automatisierte Tests in vier fachlichen Test-Suites ab:
 
 - Übersetzungen einschließlich Singular, Plural und leerer Eingaben
 - Datums-, Zeit- und Währungsformate einschließlich Idempotenz

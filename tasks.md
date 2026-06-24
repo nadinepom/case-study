@@ -11,13 +11,13 @@
 - [x] Statische und regelbasierte Übersetzungen implementiert
 - [x] Datum, Uhrzeit und Eurobeträge nach `de-DE` formatiert
 - [x] React Day Picker einschließlich Accessibility-Labels lokalisiert
-- [x] Sonner-Snackbars für Pause, Resume und variable Skip-Laufzeiten übersetzt
+- [x] Sonner-Snackbars für Pause, Resume, variable Skip-Laufzeiten und Geschmacksupdates übersetzt
 - [x] Getrennte Währungs- und Mehrknoten-Texte React-stabil verarbeitet
 - [x] Profiladresse für die deutsche Anzeige lokalisiert, ohne Formularwerte zu ändern
 - [x] React-Nachrendering mit `MutationObserver` unterstützt
 - [x] Mehrfachausführung und manuelles Stoppen ermöglicht
 - [x] Technische DOM-Bereiche und Formularwerte von Änderungen ausgeschlossen
-- [x] 16 automatisierte Tests in vier erklärbaren Test-Suites ergänzt
+- [x] 17 automatisierte Tests in vier erklärbaren Test-Suites ergänzt
 - [x] Code, Tests und Dokumentation für schnelle Lesbarkeit im Meeting final strukturiert
 - [x] README mit Status-Badges und echten Vorher-/Nachher-Screenshots ergänzt
 - [x] Konzept und Projektdokumentation erstellt

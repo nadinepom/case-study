@@ -20,7 +20,7 @@ Auf der React-Webseite treten deutsche und englische Inhalte gleichzeitig auf:
 | Dialoge | `Pause subscription`, `July 22nd, 2026`, `Close` |
 | Preise | `€89.92` statt `89,92 €` |
 | Kalender | `June 2026`, `Su`, `Tu`, `Go to next month` |
-| Snackbars | `Subscription paused`, `Subscription resumed`, `Subscription skipped for 8 weeks` |
+| Snackbars | `Subscription paused`, `Subscription skipped for 8 weeks`, `Flavors updated` |
 | Adressanzeige | `123 Main Street`, `Germany` |
 
 Die Anwendung lädt Inhalte bei Seitenwechseln, Tabwechseln und Dialogaktionen nach. Eine einmalige Bearbeitung des DOM beim Seitenaufruf wäre deshalb unvollständig.
@@ -54,7 +54,7 @@ Ein `Map` enthält bekannte statische UI-Texte. Wiederverwendbare reguläre Ausd
 
 ### Dynamische Inhalte
 
-Ein `MutationObserver` erkennt nachträglich erzeugte oder geänderte DOM-Knoten. Dazu gehören auch kurz eingeblendete Sonner-Snackbars wie `Subscription resumed`, `Subscription paused` und `Subscription skipped for 8 weeks`. Änderungen werden mit `requestAnimationFrame` gebündelt. Überlappende Teilbäume und mehrere Textänderungen desselben React-Elements werden zusammengeführt; eigene Observer-Folgemutationen werden verworfen.
+Ein `MutationObserver` erkennt nachträglich erzeugte oder geänderte DOM-Knoten. Dazu gehören auch kurz eingeblendete Sonner-Snackbars wie `Subscription resumed`, `Subscription skipped for 8 weeks` und `Flavors updated`. Änderungen werden mit `requestAnimationFrame` gebündelt. Überlappende Teilbäume und mehrere Textänderungen desselben React-Elements werden zusammengeführt; eigene Observer-Folgemutationen werden verworfen.
 
 Für häufig aufgerufene Formatierungen werden reguläre Ausdrücke einmalig vorbereitet. Reine Zahlenknoten, etwa Kalendertage und Zähler, überspringen die Übersetzungspipeline vollständig.
 
@@ -78,6 +78,7 @@ Automatisierte Node-Tests prüfen:
 - Erhalt von Leerraum sowie Idempotenz von Text, Datum, Zeit und Währung
 - Batching mehrerer React-Textmutationen
 - dynamische Snackbar-Sätze mit variablen Wochenwerten und getrennten Textknoten
+- vollständige Geschmacksupdate-Snackbars bei ein- und mehrknotigem React-Rendering
 - sichere Behandlung einer unerwarteten React-Fragmentanzahl
 - React-stabile Preisupdates
 - Day-Picker-Texte und Accessibility-Attribute mit positivem und negativem Kontexttest
@@ -85,7 +86,7 @@ Automatisierte Node-Tests prüfen:
 
 Die manuelle Testmatrix umfasst Dashboard, Abo-Tabs, neues Abo, Bestellverlauf, Profil sowie Pause-, Überspringen-, Storno- und Adressdialoge. Details zur Ausführung stehen in `README.md`.
 
-Beim abschließenden DOM-Abgleich wurden 685 echte Elemente aus sechs Hauptseiten und sechs dynamischen Zuständen gegen das Skript geprüft. Zusätzlich wurden die originalen Pause-, Resume- und Überspringen-Snackbars sowie die Profiladresskarte gezielt ausgelesen. Technische IDs wurden aus der Sprachprüfung ausgeschlossen; sichtbare englische Resttexte wurden nicht gefunden.
+Beim damaligen DOM-Abgleich wurden 685 echte Elemente aus sechs Hauptseiten und sechs dynamischen Zuständen gegen das Skript geprüft. Zusätzlich wurden die originalen Pause-, Resume- und Überspringen-Snackbars sowie die Profiladresskarte gezielt ausgelesen. Technische IDs wurden aus der Sprachprüfung ausgeschlossen; in diesem Prüfstand wurden keine weiteren sichtbaren englischen Resttexte gefunden. Später entdeckte UI-Texte, etwa `Flavors updated`, wurden als eigene Regressionstests ergänzt.
 
 ## Abwägungen und Risiken
 

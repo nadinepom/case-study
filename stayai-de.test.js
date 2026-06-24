@@ -166,6 +166,12 @@ describe("Textübersetzung", { concurrency: false }, () => {
     assert.equal(api.translateText("Upcoming"), "Geplant");
     assert.equal(api.translateText("Subscription paused"), "Abonnement pausiert");
     assert.equal(api.translateText("Subscription resumed"), "Abonnement fortgesetzt");
+    assert.equal(api.translateText("Flavors updated"), "Geschmacksrichtungen aktualisiert");
+    assert.equal(
+      api.translateText("Geschmacksrichtungen updated"),
+      "Geschmacksrichtungen aktualisiert",
+    );
+    assert.equal(api.translateText("Last updated"), "Last updated");
     assert.equal(
       api.translateText("Subscription skipped for 8 weeks"),
       "Abonnement für 8 Wochen übersprungen",
@@ -274,6 +280,17 @@ describe("React-Mehrknotentexte", { concurrency: false }, () => {
 
     assert.equal(textOf(snackbar), "Abonnement für 8 Wochen übersprungen");
     assert.equal(snackbar.childNodes.length, 3);
+  });
+
+  test("übersetzt eine aufgeteilte Aktualisierungs-Snackbar vollständig", () => {
+    const snackbar = createElement(["Flavors ", "updated"], {
+      tagName: "DIV",
+    });
+
+    refreshElements(snackbar);
+
+    assert.equal(textOf(snackbar), "Geschmacksrichtungen aktualisiert");
+    assert.equal(snackbar.childNodes.length, 2);
   });
 
   test("bewahrt eine unbekannte Fragmentaufteilung sicher auf", () => {
