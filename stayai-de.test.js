@@ -4,7 +4,9 @@ const assert = require("node:assert/strict");
 const { after, describe, test } = require("node:test");
 
 let animationFrameCallback;
+let cancelledAnimationFrameId;
 let mutationObserverCallback;
+let observerDisconnectCalls;
 
 // Runs setup or cleanup without adding production log messages to test output.
 function withoutConsoleInfo(callback) {
@@ -19,6 +21,8 @@ function withoutConsoleInfo(callback) {
 
 // Creates the small browser surface that stayai-de.js needs in Node.js.
 function installBrowserMocks() {
+  cancelledAnimationFrameId = null;
+  observerDisconnectCalls = 0;
   global.window = {};
   global.Node = { DOCUMENT_NODE: 9, ELEMENT_NODE: 1, TEXT_NODE: 3 };
   global.NodeFilter = { SHOW_ELEMENT: 1, SHOW_TEXT: 4 };
@@ -38,7 +42,9 @@ function installBrowserMocks() {
       mutationObserverCallback = callback;
     }
 
-    disconnect() {}
+    disconnect() {
+      observerDisconnectCalls += 1;
+    }
     observe() {}
 
     takeRecords() {
@@ -50,7 +56,10 @@ function installBrowserMocks() {
     animationFrameCallback = callback;
     return 1;
   };
-  global.cancelAnimationFrame = () => {};
+  global.cancelAnimationFrame = (animationFrameId) => {
+    cancelledAnimationFrameId = animationFrameId;
+    animationFrameCallback = null;
+  };
 }
 
 // Loads the console script once and returns its public test API.
@@ -68,7 +77,9 @@ function loadTranslationApi() {
 function createElement(values, options = {}) {
   const {
     attributes = {},
+    insideEditable = false,
     insideDayPicker = false,
+    parentElement = null,
     previousElementSibling = null,
     tagName = "DIV",
     value,
@@ -79,7 +90,11 @@ function createElement(values, options = {}) {
     attributes: { ...attributes },
     childElementCount: 0,
     childNodes: [],
-    closest: (selector) => (insideDayPicker && selector === ".rdp" ? element : null),
+    closest: (selector) => {
+      if (insideDayPicker && selector === ".rdp") return element;
+      if (insideEditable && selector.includes("[contenteditable]")) return element;
+      return null;
+    },
     getAttribute(name) {
       return this.attributes[name] ?? null;
     },
@@ -87,6 +102,7 @@ function createElement(values, options = {}) {
       return Object.hasOwn(this.attributes, name);
     },
     nodeType: Node.ELEMENT_NODE,
+    parentElement,
     previousElementSibling,
     setAttribute(name, attributeValue) {
       this.attributes[name] = attributeValue;
@@ -294,16 +310,17 @@ describe("React-Mehrknotentexte", { concurrency: false }, () => {
   });
 
   test("bewahrt eine unbekannte Fragmentaufteilung sicher auf", () => {
-    const billingText = createElement(["Billed ", "every ", "1 ", "week"], {
-      tagName: "P",
-    });
+    const snackbar = createElement(
+      ["Subscription ", "skipped ", "for ", "8 weeks"],
+      { tagName: "DIV" },
+    );
 
-    refreshElements(billingText);
+    refreshElements(snackbar);
 
-    assert.equal(textOf(billingText), "Billed every 1 week");
+    assert.equal(textOf(snackbar), "Subscription skipped for 8 weeks");
     assert.deepEqual(
-      billingText.childNodes.map((node) => node.nodeValue),
-      ["Billed ", "every ", "1 ", "week"],
+      snackbar.childNodes.map((node) => node.nodeValue),
+      ["Subscription ", "skipped ", "for ", "8 weeks"],
     );
   });
 
@@ -363,6 +380,50 @@ describe("DOM-Sicherheit und dynamische Updates", { concurrency: false }, () => 
 
     assert.equal(textOf(visibleText), "Übersicht");
     assert.equal(textOf(scriptText), "Dashboard");
+  });
+
+  test("schützt editierbare Inhalte und bekannte Kundendatenanzeigen", () => {
+    const editableText = createElement("Subscription Active", {
+      insideEditable: true,
+      tagName: "DIV",
+    });
+    const greeting = createElement("Willkommen zurück, ", {
+      tagName: "H1",
+    });
+    greeting.childElementCount = 1;
+    const greetingName = createElement("Active", {
+      parentElement: greeting,
+      tagName: "SPAN",
+    });
+    const nameLabel = createElement("Name", { tagName: "P" });
+    const nameValue = createElement(["Subscription skipped for ", "8", " weeks"], {
+      previousElementSibling: nameLabel,
+      tagName: "P",
+    });
+    const emailLabel = createElement("E-Mail-Adresse", { tagName: "P" });
+    const emailValue = createElement("Active@example.com", {
+      previousElementSibling: emailLabel,
+      tagName: "P",
+    });
+    const regularStatus = createElement("Active", { tagName: "SPAN" });
+
+    refreshElements(
+      editableText,
+      greeting,
+      greetingName,
+      nameLabel,
+      nameValue,
+      emailLabel,
+      emailValue,
+      regularStatus,
+    );
+
+    assert.equal(textOf(editableText), "Subscription Active");
+    assert.equal(textOf(greeting), "Willkommen zurück, ");
+    assert.equal(textOf(greetingName), "Active");
+    assert.equal(textOf(nameValue), "Subscription skipped for 8 weeks");
+    assert.equal(textOf(emailValue), "Active@example.com");
+    assert.equal(textOf(regularStatus), "Aktiv");
   });
 
   test("lokalisiert angezeigte Adresswerte ohne Formularfelder zu verändern", () => {
@@ -434,5 +495,64 @@ describe("DOM-Sicherheit und dynamische Updates", { concurrency: false }, () => 
 
     assert.equal(walkerCalls, 1);
     assert.equal(textOf(paragraph), "Gestartet am 22. Juni 2026");
+  });
+
+  test("übersetzt neu eingefügte DOM-Teilbäume", () => {
+    const addedElement = createElement("Dashboard", { tagName: "P" });
+    const nodes = [...addedElement.childNodes];
+    document.createTreeWalker = () => ({
+      currentNode: null,
+      nextNode() {
+        this.currentNode = nodes.shift();
+        return Boolean(this.currentNode);
+      },
+    });
+
+    flushMutations([
+      {
+        addedNodes: [addedElement],
+        target: document.documentElement,
+        type: "childList",
+      },
+    ]);
+
+    assert.equal(textOf(addedElement), "Übersicht");
+  });
+
+  test("übersetzt nachträglich geänderte Attribute", () => {
+    const notificationButton = createElement("", {
+      attributes: { "aria-label": "Notifications" },
+      tagName: "BUTTON",
+    });
+    document.createTreeWalker = () => ({ nextNode: () => false });
+
+    flushMutations([
+      {
+        attributeName: "aria-label",
+        target: notificationButton,
+        type: "attributes",
+      },
+    ]);
+
+    assert.equal(notificationButton.getAttribute("aria-label"), "Benachrichtigungen");
+  });
+
+  test("stoppt eine bereits eingeplante DOM-Aktualisierung", () => {
+    const addedText = createElement("Dashboard", { tagName: "P" }).childNodes[0];
+    mutationObserverCallback([
+      {
+        addedNodes: [addedText],
+        target: document.documentElement,
+        type: "childList",
+      },
+    ]);
+
+    assert.equal(typeof animationFrameCallback, "function");
+
+    withoutConsoleInfo(() => api.stop());
+
+    assert.equal(cancelledAnimationFrameId, 1);
+    assert.equal(animationFrameCallback, null);
+    assert.equal(observerDisconnectCalls, 1);
   });
 });

@@ -73,6 +73,9 @@
 
   const translatableAttributes = ["aria-label", "alt", "placeholder", "title"];
   const skippedTagNames = new Set(["NOSCRIPT", "SCRIPT", "STYLE", "TEMPLATE", "TEXTAREA"]);
+  const editableContainerSelector =
+    '[contenteditable]:not([contenteditable="false"]), [role="textbox"]';
+  const customerDataLabels = new Set(["Name", "E-Mail-Adresse", "Email Address"]);
   const dayPickerTranslations = new Map([
     ["Su", "So"],
     ["Tu", "Di"],
@@ -328,6 +331,7 @@
       ],
     },
   ];
+  const blockedSplitTextElements = new WeakSet();
 
   // Converts 12-hour times, e.g. "3:30 PM" -> "15:30 Uhr".
   function formatTimes(value) {
@@ -444,6 +448,44 @@
     );
   }
 
+  // Returns the visible text stored directly on one element.
+  function getDirectText(element) {
+    return getDirectTextNodes(element)
+      .map((textNode) => textNode.nodeValue)
+      .join("")
+      .trim();
+  }
+
+  // Identifies the customer values observed in the greeting and profile view.
+  function isCustomerDataDisplayElement(element) {
+    if (!element) return false;
+
+    const isHeading = /^H[1-6]$/.test(element.tagName);
+    if (!isHeading && element.tagName !== "P") return false;
+    if (isHeading) return getDirectText(element).startsWith("Willkommen zurück,");
+
+    const labelElement = element.previousElementSibling;
+    if (labelElement?.tagName !== "P") return false;
+
+    return customerDataLabels.has(getDirectText(labelElement));
+  }
+
+  // Extends customer-data protection to nested spans and other descendants.
+  function isInsideCustomerDataDisplay(element) {
+    for (let currentElement = element; currentElement; currentElement = currentElement.parentElement) {
+      if (isCustomerDataDisplayElement(currentElement)) return true;
+    }
+    return false;
+  }
+
+  // Protects editable content and known customer values from text translation.
+  function shouldSkipTextNode(textNode) {
+    const parentElement = textNode.parentElement;
+    if (!parentElement || skippedTagNames.has(parentElement.tagName)) return true;
+    if (parentElement.closest?.(editableContainerSelector)) return true;
+    return isInsideCustomerDataDisplay(parentElement);
+  }
+
   // Localizes displayed profile values without changing the underlying form fields.
   function formatAddressDisplayElement(element) {
     if (element?.tagName !== "P" || element.childElementCount > 0) return;
@@ -451,10 +493,7 @@
     const labelElement = element.previousElementSibling;
     if (labelElement?.tagName !== "P") return;
 
-    const label = getDirectTextNodes(labelElement)
-      .map((textNode) => textNode.nodeValue)
-      .join("")
-      .trim();
+    const label = getDirectText(labelElement);
     const valueNodes = getDirectTextNodes(element);
     if (valueNodes.length !== 1) return;
 
@@ -476,7 +515,10 @@
 
   // Rebuilds known split sentences without merging or removing React text nodes.
   function translateSplitTextElement(element) {
-    if (!element || element.childElementCount > 0) return;
+    if (!element) return;
+
+    blockedSplitTextElements.delete(element);
+    if (element.childElementCount > 0) return;
 
     const textNodes = getDirectTextNodes(element);
     if (textNodes.length < 2) return;
@@ -487,7 +529,10 @@
       if (!match) continue;
 
       const translatedFragments = rule.fragments(match);
-      if (translatedFragments.length !== textNodes.length) return;
+      if (translatedFragments.length !== textNodes.length) {
+        blockedSplitTextElements.add(element);
+        return;
+      }
 
       textNodes.forEach((textNode, index) => {
         if (textNode.nodeValue !== translatedFragments[index]) {
@@ -534,6 +579,8 @@
   // Applies all element-level transformations in their required order.
   function processElement(element) {
     if (!element || skippedTagNames.has(element.tagName)) return;
+    if (element.closest?.(editableContainerSelector)) return;
+    if (isInsideCustomerDataDisplay(element)) return;
 
     formatAddressDisplayElement(element);
     translateSplitTextElement(element);
@@ -545,9 +592,10 @@
 
   // Translates one text node unless it belongs to a technical/editable container.
   function translateTextNode(textNode, processParent = true) {
-    if (skippedTagNames.has(textNode.parentElement?.tagName)) return;
+    if (shouldSkipTextNode(textNode)) return;
 
     if (processParent) processElement(textNode.parentElement);
+    if (blockedSplitTextElements.has(textNode.parentElement)) return;
 
     const dayPickerValue = translateDayPickerText(textNode.nodeValue, textNode.parentElement);
     const translatedValue = translateText(dayPickerValue);
